@@ -1,48 +1,10 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Portafolio con Modo Oscuro</title>
+  <title>Mi Portafolio Kawaii</title>
+  <link href="https://fonts.googleapis.com/css2?family=Anime+Ace&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
   <style>
     /* Tailwind CSS minimizado para las clases usadas */
     .container { max-width: 1280px; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
@@ -70,7 +32,6 @@
     .gap-8 { gap: 2rem; }
     .fixed { position: fixed; }
     .bottom-0 { bottom: 0; }
-    .top-0 { top: 0; }
     .z-10 { z-index: 10; }
     .z-50 { z-index: 50; }
     .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
@@ -95,7 +56,8 @@
     .text-3xl { font-size: 1.875rem; }
     .text-4xl { font-size: 2.25rem; }
     .text-6xl { font-size: 3.75rem; }
-    .font-sans { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; }
+    .font-sans { font-family: 'Noto Sans JP', sans-serif; }
+    .font-anime { font-family: 'Anime Ace', sans-serif; }
     .font-medium { font-weight: 500; }
     .font-semibold { font-weight: 600; }
     .font-bold { font-weight: 700; }
@@ -107,10 +69,12 @@
     .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
     .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
     .transition-colors { transition-property: color, background-color, border-color, fill, stroke; }
+    .transition-transform { transition-property: transform; }
     .duration-300 { transition-duration: 300ms; }
     .hover\:bg-gray-200:hover { background-color: #edf2f7; }
     .hover\:text-gray-200:hover { color: #edf2f7; }
     .hover\:underline:hover { text-decoration: underline; }
+    .hover\:scale-110:hover { transform: scale(1.1); }
     @media (min-width: 640px) {
       .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
@@ -139,10 +103,16 @@
     [data-theme="dark"] .bg-green-600 {
       background-color: #2f855a;
     }
-    /* Estilos para modo claro */
+    /* Estilos para modo claro (pastel) */
     [data-theme="light"] {
-      background-color: #f7fafc;
+      background-color: #fef6fb;
       color: #1a202c;
+    }
+    [data-theme="light"] .bg-gray-100 {
+      background-color: #ffe4e6;
+    }
+    [data-theme="light"] .bg-white {
+      background-color: #fff1f2;
     }
     /* Estilo para el cuadro de búsqueda */
     #search-box {
@@ -163,23 +133,31 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: #1a202c;
+      background: linear-gradient(to bottom, #2f855a, #f472b6);
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
       z-index: 100;
       opacity: 1;
       transition: opacity 0.5s ease-in-out;
     }
     #loading-screen.hidden {
       opacity: 0;
-      pointer-events: none;
+      display: none;
     }
     #loading-screen img {
       max-width: 80%;
       max-height: 80%;
       width: auto;
       height: auto;
+      animation: heartbeat 1.5s ease-in-out infinite;
+    }
+    #loading-screen p {
+      margin-top: 1rem;
+      font-family: 'Anime Ace', sans-serif;
+      color: #fff;
+      font-size: 1.25rem;
     }
     @media (min-width: 768px) {
       #loading-screen img {
@@ -187,30 +165,58 @@
         max-height: 600px;
       }
     }
+    /* Animación de latido */
+    @keyframes heartbeat {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    /* Estilo para íconos personalizados */
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.3s ease;
+    }
+    .nav-icon:hover {
+      transform: scale(1.2);
+    }
+    /* Asegurar que el body tenga altura mínima */
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
   </style>
 </head>
 <body class="bg-gray-100 font-sans transition-colors duration-300">
-  <!-- Pantalla de Carga -->
-  <div id="loading-screen">
-    <img src="assets/logo.png" alt="Chica Anime" onerror="this.src='https://via.placeholder.com/600x600?text=Chica+Anime'">
-  </div>
-
   <!-- Hero Section -->
   <section id="inicio" class="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-600 to-green-400 text-white pt-16">
     <div class="container mx-auto text-center px-4">
-      <h2 class="text-4xl md:text-6xl font-bold mb-4">¡Bienvenid@ a mi Portafolio!</h2>
+      <h2 class="text-4xl md:text-6xl font-anime font-bold mb-4">¡Bienvenid@ a mi Portafolio!</h2>
       <p class="text-lg md:text-2xl mb-6">Explora mis películas favoritas en modo oscuro.</p>
       <a href="#peliculas" class="bg-white text-green-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-200">Ver Películas</a>
+    </div>
+  </section>
+
+  <!-- Sobre Mí -->
+  <section id="sobre-mi" class="py-16 bg-gray-100">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-3xl font-anime font-bold mb-8">Sobre Mí</h2>
+      <div class="max-w-md mx-auto">
+        <img src="assets/avatar.png" alt="Mi Avatar" class="w-32 h-32 rounded-full mx-auto mb-4" onerror="this.src='https://via.placeholder.com/128x128?text=Avatar'">
+        <p class="text-gray-600 font-sans">¡Hola, soy [Tu Nombre]! Amo el anime, las películas épicas y crear cosas kawaii. Explora mi portafolio y déjame un mensaje. 😺✨</p>
+      </div>
     </div>
   </section>
 
   <!-- Sección de Películas -->
   <section id="peliculas" class="py-16 bg-gray-100">
     <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-8">Mis Películas Favoritas</h2>
+      <h2 class="text-3xl font-anime font-bold text-center mb-8">Mis Películas Favoritas</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <h3 class="text-xl font-semibold mb-2">Película 1</h3>
+        <div class="bg-white rounded-lg shadow-lg p-6 relative">
+          <span class="absolute top-2 right-2 text-yellow-400">⭐</span>
+          <h3 class="text-xl font-anime font-semibold mb-2">Película 1</h3>
           <video controls class="w-full rounded mb-4" poster="https://via.placeholder.com/300x150">
             <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
             Tu navegador no soporta videos.
@@ -218,8 +224,9 @@
           <p class="text-gray-600 mb-4">Descripción breve de la película 1.</p>
           <a href="#" class="text-green-600 hover:underline">Ver más</a>
         </div>
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <h3 class="text-xl font-semibold mb-2">Película 2</h3>
+        <div class="bg-white rounded-lg shadow-lg p-6 relative">
+          <span class="absolute top-2 right-2 text-yellow-400">⭐</span>
+          <h3 class="text-xl font-anime font-semibold mb-2">Película 2</h3>
           <video controls class="w-full rounded mb-4" poster="https://via.placeholder.com/300x150">
             <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
             Tu navegador no soporta videos.
@@ -227,8 +234,9 @@
           <p class="text-gray-600 mb-4">Descripción breve de la película 2.</p>
           <a href="#" class="text-green-600 hover:underline">Ver más</a>
         </div>
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <h3 class="text-xl font-semibold mb-2">Película 3</h3>
+        <div class="bg-white rounded-lg shadow-lg p-6 relative">
+          <span class="absolute top-2 right-2 text-yellow-400">⭐</span>
+          <h3 class="text-xl font-anime font-semibold mb-2">Película 3</h3>
           <video controls class="w-full rounded mb-4" poster="https://via.placeholder.com/300x150">
             <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
             Tu navegador no soporta videos.
@@ -243,7 +251,7 @@
   <!-- Contacto -->
   <section id="contacto" class="py-16 bg-green-600 text-white">
     <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-8">Contáctame</h2>
+      <h2 class="text-3xl font-anime font-bold text-center mb-8">Contáctame</h2>
       <div class="max-w-lg mx-auto">
         <div class="mb-4">
           <label for="nombre" class="block text-sm font-medium">Nombre</label>
@@ -265,22 +273,15 @@
   <!-- Barra de Navegación Inferior -->
   <nav class="bg-green-600 text-white p-4 fixed bottom-0 w-full shadow-md flex justify-around items-center z-10">
     <a href="#inicio" class="flex flex-col items-center hover:text-gray-200">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-9 5v6h4v-6m2-2h.01" />
-      </svg>
+      <img src="assets/iconos/home.png" alt="Inicio" class="nav-icon" onerror="this.src='https://via.placeholder.com/24x24?text=Home'">
       <span class="text-xs">Inicio</span>
     </a>
     <button id="search-toggle" class="flex flex-col items-center hover:text-gray-200">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-      </svg>
+      <img src="assets/iconos/search.png" alt="Buscar" class="nav-icon" onerror="this.src='https://via.placeholder.com/24x24?text=Search'">
       <span class="text-xs">Buscar</span>
     </button>
     <button id="settings-toggle" class="flex flex-col items-center hover:text-gray-200">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
+      <img src="assets/iconos/settings.png" alt="Ajustes" class="nav-icon" onerror="this.src='https://via.placeholder.com/24x24?text=Settings'">
       <span class="text-xs">Ajustes</span>
     </button>
   </nav>
@@ -300,14 +301,27 @@
     </div>
   </footer>
 
+  <!-- Pantalla de Carga -->
+  <div id="loading-screen">
+    <img src="assets/logo.png" alt="Chica Anime" onerror="this.src='https://via.placeholder.com/600x600?text=Chica+Anime'">
+    <p>Cargando mi mundo kawaii... ✨</p>
+  </div>
+
   <script>
-    // Ocultar pantalla de carga después de 2 segundos
+    // Log inicial para confirmar que el script carga
+    console.log('Script iniciado');
+
+    // Ocultar pantalla de carga después de 7 segundos
     window.addEventListener('load', () => {
       const loadingScreen = document.getElementById('loading-screen');
       if (loadingScreen) {
+        console.log('Pantalla de carga iniciada');
         setTimeout(() => {
           loadingScreen.classList.add('hidden');
-        }, 2000);
+          console.log('Pantalla de carga ocultada');
+        }, 7000);
+      } else {
+        console.log('Error: No se encontró el elemento #loading-screen');
       }
     });
 
@@ -319,7 +333,10 @@
         const currentTheme = html.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         html.setAttribute('data-theme', newTheme);
+        console.log('Tema cambiado a:', newTheme);
       });
+    } else {
+      console.log('Error: No se encontró el elemento #settings-toggle');
     }
 
     // Toggle cuadro de búsqueda
@@ -331,11 +348,15 @@
       searchToggle.addEventListener('click', () => {
         searchBox.classList.toggle('active');
         searchInput.focus();
+        console.log('Cuadro de búsqueda abierto');
       });
       searchClose.addEventListener('click', () => {
         searchBox.classList.remove('active');
         searchInput.value = '';
+        console.log('Cuadro de búsqueda cerrado');
       });
+    } else {
+      console.log('Error: No se encontraron uno o más elementos de búsqueda');
     }
 
     // Enviar mensaje
@@ -344,14 +365,19 @@
       const email = document.getElementById('email');
       const mensaje = document.getElementById('mensaje');
       if (nombre && email && mensaje && nombre.value && email.value && mensaje.value) {
-        alert('Mensaje enviado con éxito. ¡Gracias por contactarme!');
+        alert('Mensaje enviado con éxito. ¡Gracias por contactarme! 💖');
         nombre.value = '';
         email.value = '';
         mensaje.value = '';
+        console.log('Mensaje enviado');
       } else {
         alert('Por favor, completa todos los campos.');
+        console.log('Error: Campos de contacto incompletos');
       }
     }
+
+    // Log para confirmar que el contenido debería estar visible
+    console.log('Contenido cargado, revisa el DOM');
   </script>
 </body>
 </html>
