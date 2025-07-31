@@ -1,4 +1,43 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8">
@@ -31,6 +70,7 @@
     .gap-8 { gap: 2rem; }
     .fixed { position: fixed; }
     .bottom-0 { bottom: 0; }
+    .top-0 { top: 0; }
     .z-10 { z-index: 10; }
     .z-50 { z-index: 50; }
     .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
@@ -116,15 +156,45 @@
       transform: translate(-50%, -50%);
       z-index: 50;
     }
-    /* Asegurar que el body tenga altura mínima */
-    body {
-      min-height: 100vh;
+    /* Estilo para la pantalla de carga */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #1a202c;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      opacity: 1;
+      transition: opacity 0.5s ease-in-out;
+    }
+    #loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #loading-screen img {
+      max-width: 80%;
+      max-height: 80%;
+      width: auto;
+      height: auto;
+    }
+    @media (min-width: 768px) {
+      #loading-screen img {
+        max-width: 600px;
+        max-height: 600px;
+      }
     }
   </style>
 </head>
 <body class="bg-gray-100 font-sans transition-colors duration-300">
+  <!-- Pantalla de Carga -->
+  <div id="loading-screen">
+    <img src="assets/logo.png" alt="Chica Anime" onerror="this.src='https://via.placeholder.com/600x600?text=Chica+Anime'">
+  </div>
+
   <!-- Hero Section -->
   <section id="inicio" class="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-600 to-green-400 text-white pt-16">
     <div class="container mx-auto text-center px-4">
@@ -231,8 +301,15 @@
   </footer>
 
   <script>
-    // Log inicial para confirmar que el script carga
-    console.log('Script iniciado');
+    // Ocultar pantalla de carga después de 2 segundos
+    window.addEventListener('load', () => {
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        setTimeout(() => {
+          loadingScreen.classList.add('hidden');
+        }, 2000);
+      }
+    });
 
     // Toggle modo oscuro
     const settingsToggle = document.getElementById('settings-toggle');
@@ -242,10 +319,7 @@
         const currentTheme = html.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         html.setAttribute('data-theme', newTheme);
-        console.log('Tema cambiado a:', newTheme);
       });
-    } else {
-      console.log('Error: No se encontró el elemento #settings-toggle');
     }
 
     // Toggle cuadro de búsqueda
@@ -257,15 +331,11 @@
       searchToggle.addEventListener('click', () => {
         searchBox.classList.toggle('active');
         searchInput.focus();
-        console.log('Cuadro de búsqueda abierto');
       });
       searchClose.addEventListener('click', () => {
         searchBox.classList.remove('active');
         searchInput.value = '';
-        console.log('Cuadro de búsqueda cerrado');
       });
-    } else {
-      console.log('Error: No se encontraron uno o más elementos de búsqueda');
     }
 
     // Enviar mensaje
@@ -278,15 +348,10 @@
         nombre.value = '';
         email.value = '';
         mensaje.value = '';
-        console.log('Mensaje enviado');
       } else {
         alert('Por favor, completa todos los campos.');
-        console.log('Error: Campos de contacto incompletos');
       }
     }
-
-    // Log para confirmar que el contenido debería estar visible
-    console.log('Contenido cargado, revisa el DOM');
   </script>
 </body>
 </html>
