@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PelisDelPecado - Películas Arcade</title>
+    <title>RetroFlix - Películas Arcade</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -19,7 +19,7 @@
 
     <!-- Barra de navegación superior (PC) -->
     <nav class="navbar desktop-nav">
-        <div class="logo">PelisDelPecado</div>
+        <div class="logo">RETROFLIX</div>
         <ul class="nav-links">
             <li><a href="#"><i class="fas fa-home"></i> <span>Inicio</span></a></li>
             <li><a href="#"><i class="fas fa-search"></i> <span>Buscar</span></a></li>
@@ -43,6 +43,17 @@
 
     <!-- Contenido principal -->
     <main>
+        <!-- Carrusel de películas destacadas -->
+        <section class="carousel-section">
+            <div class="carousel-container">
+                <div class="carousel" id="carousel">
+                    <!-- Imágenes se cargarán con JavaScript -->
+                </div>
+                <button class="carousel-control prev" id="prevSlide"><i class="fas fa-chevron-left"></i></button>
+                <button class="carousel-control next" id="nextSlide"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </section>
+
         <!-- Buscador -->
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Buscar películas..." class="search-input">

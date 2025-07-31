@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Simular pantalla de carga
     setTimeout(function() {
         document.getElementById('loadingScreen').style.display = 'none';
-    }, 2000);
+    }, 5000);
 
     // Datos de películas de prueba
     const movies = [
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
             title: "CYBER RUNNER 2077",
             year: 2023,
             genre: "Sci-Fi",
-            poster: "https://via.placeholder.com/300x450/1a1a1a/ff003c?text=CYBER+RUNNER",
+            poster: "assets/peliculas/1.png",
             video: "cyberrunner2077.mp4",
             description: "Un hacker debe correr contra el tiempo para salvar la ciudad digital."
         },
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
             title: "NINJA QUEST",
             year: 2022,
             genre: "Acción",
-            poster: "https://via.placeholder.com/300x450/1a1a1a/00f0ff?text=NINJA+QUEST",
+            poster: "assets/peliculas/2.png",
             video: "ninjaquest.mp4",
             description: "Un ninja solitario busca venganza en un mundo pixelado."
         },
@@ -29,11 +29,49 @@ document.addEventListener('DOMContentLoaded', function() {
             title: "RETRO APOCALYPSE",
             year: 2024,
             genre: "Aventura",
-            poster: "https://via.placeholder.com/300x450/1a1a1a/ffffff?text=RETRO+APOCALYPSE",
+            poster: "assets/peliculas/3.png",
             video: "retroapocalypse.mp4",
             description: "Supervive en un mundo post-apocalíptico con estética 8-bit."
         }
     ];
+
+    // Cargar carrusel
+    const carousel = document.getElementById('carousel');
+    movies.forEach(movie => {
+        const slide = document.createElement('img');
+        slide.src = movie.poster;
+        slide.alt = movie.title;
+        carousel.appendChild(slide);
+    });
+
+    // Configurar carrusel
+    let currentSlide = 0;
+    const slides = carousel.children;
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+        if (index >= totalSlides) {
+            currentSlide = 0;
+        } else if (index < 0) {
+            currentSlide = totalSlides - 1;
+        } else {
+            currentSlide = index;
+        }
+        carousel.style.transform = `translateX(-${currentSlide * 100}%)`;
+    }
+
+    document.getElementById('prevSlide').addEventListener('click', () => {
+        showSlide(currentSlide - 1);
+    });
+
+    document.getElementById('nextSlide').addEventListener('click', () => {
+        showSlide(currentSlide + 1);
+    });
+
+    // Auto-avance del carrusel cada 5 segundos
+    setInterval(() => {
+        showSlide(currentSlide + 1);
+    }, 5000);
 
     // Cargar películas en el grid
     const moviesGrid = document.getElementById('moviesGrid');
