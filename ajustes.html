@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetroFlix - Ajustes</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Pantalla de carga -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">CARGANDO...</p>
+        </div>
+    </div>
+
+    <!-- Barra de navegación superior (PC) -->
+    <nav class="navbar desktop-nav">
+        <div class="logo">RETROFLIX</div>
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> <span>Inicio</span></a></li>
+            <li><a href="busca.html"><i class="fas fa-search"></i> <span>Buscar</span></a></li>
+            <li><a href="#"><i class="fas fa-film"></i> <span>Películas</span></a></li>
+            <li><a href="ajustes.html" class="active"><i class="fas fa-cog"></i> <span>Ajustes</span></a></li>
+        </ul>
+        <div class="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </div>
+    </nav>
+
+    <!-- Barra de navegación inferior (Móvil) -->
+    <nav class="navbar mobile-nav">
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> <span>Inicio</span></a></li>
+            <li><a href="busca.html"><i class="fas fa-search"></i> <span>Buscar</span></a></li>
+            <li><a href="#"><i class="fas fa-film"></i> <span>Películas</span></a></li>
+            <li><a href="ajustes.html" class="active"><i class="fas fa-cog"></i> <span>Ajustes</span></a></li>
+        </ul>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main>
+        <!-- Sección de ajustes -->
+        <section class="settings-section">
+            <h2 class="section-title">AJUSTES</h2>
+            <div class="settings-container">
+                <div class="setting-item profile-section">
+                    <label>Perfil</label>
+                    <div class="profile-picture-container">
+                        <img id="profilePicture" src="assets/default-profile.png" alt="Foto de perfil" class="profile-picture">
+                        <input type="file" id="profilePictureInput" accept="image/*" style="display: none;">
+                    </div>
+                    <button id="changePictureButton" class="change-picture-button">Cambiar Foto</button>
+                </div>
+                <div class="setting-item">
+                    <label for="usernameInput">Nombre</label>
+                    <input type="text" id="usernameInput" class="profile-input" placeholder="Ingresa tu nombre">
+                </div>
+                <div class="setting-item">
+                    <label>Sesión</label>
+                    <button id="sessionButton" class="session-button">Iniciar Sesión</button>
+                </div>
+                <div class="setting-item">
+                    <label for="themeToggle">Modo Oscuro</label>
+                    <input type="checkbox" id="themeToggle" class="theme-checkbox">
+                </div>
+                <div class="setting-item">
+                    <label for="languageSelect">Idioma</label>
+                    <select id="languageSelect" class="select-setting">
+                        <option value="es">Español</option>
+                        <option value="en">Inglés</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="videoQuality">Calidad de Video</label>
+                    <select id="videoQuality" class="select-setting">
+                        <option value="low">Baja (480p)</option>
+                        <option value="medium">Media (720p)</option>
+                        <option value="high">Alta (1080p)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Borrar Datos</label>
+                    <button id="resetData" class="reset-button">Borrar</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="ajustes.js"></script>
+</body>
+</html>
