@@ -22,7 +22,7 @@
         <div class="logo">RETROFLIX</div>
         <ul class="nav-links">
             <li><a href="#"><i class="fas fa-home"></i> <span>Inicio</span></a></li>
-            <li><a href="busca.html"><i class="fas fa-search"></i> <span>Buscar</span></a></li>
+            <li><a href="#"><i class="fas fa-search"></i> <span>Buscar</span></a></li>
             <li><a href="#"><i class="fas fa-film"></i> <span>Películas</span></a></li>
             <li><a href="#"><i class="fas fa-cog"></i> <span>Ajustes</span></a></li>
         </ul>
@@ -35,7 +35,7 @@
     <nav class="navbar mobile-nav">
         <ul class="nav-links">
             <li><a href="#"><i class="fas fa-home"></i> <span>Inicio</span></a></li>
-            <li><a href="busca.html"><i class="fas fa-search"></i> <span>Buscar</span></a></li>
+            <li><a href="#"><i class="fas fa-search"></i> <span>Buscar</span></a></li>
             <li><a href="#"><i class="fas fa-film"></i> <span>Películas</span></a></li>
             <li><a href="#"><i class="fas fa-cog"></i> <span>Ajustes</span></a></li>
         </ul>
@@ -54,11 +54,17 @@
             </div>
         </section>
 
-        <!-- Buscador -->
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Buscar películas..." class="search-input">
-            <button class="search-button"><i class="fas fa-search"></i></button>
-        </div>
+        <!-- Sección de películas -->
+        <section class="movies-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Buscar películas..." class="search-input">
+                <button class="search-button"><i class="fas fa-search"></i></button>
+            </div>
+            <h2 class="section-title">PELÍCULAS POPULARES</h2>
+            <div class="movies-grid" id="moviesGrid">
+                <!-- Películas se cargarán aquí con JavaScript -->
+            </div>
+        </section>
 
         <!-- Reproductor de video (oculto inicialmente) -->
         <div class="video-player-container" id="videoPlayerContainer">
@@ -73,14 +79,6 @@
                 <button class="add-to-list"><i class="fas fa-plus"></i> Mi lista</button>
             </div>
         </div>
-
-        <!-- Sección de películas -->
-        <section class="movies-section">
-            <h2 class="section-title">PELÍCULAS POPULARES</h2>
-            <div class="movies-grid" id="moviesGrid">
-                <!-- Películas se cargarán aquí con JavaScript -->
-            </div>
-        </section>
     </main>
 
     <script src="script.js"></script>

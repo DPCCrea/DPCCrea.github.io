@@ -32,12 +32,21 @@ document.addEventListener('DOMContentLoaded', function() {
             poster: "assets/peliculas/3.png",
             video: "retroapocalypse.mp4",
             description: "Supervive en un mundo post-apocalíptico con estética 8-bit."
+        },
+        {
+            id: 4,
+            title: "PIXEL WARRIOR",
+            year: 2025,
+            genre: "Acción",
+            poster: "assets/peliculas/4.png",
+            video: "pixelwarrior.mp4",
+            description: "Un guerrero lucha en un torneo interdimensional de 16 bits."
         }
     ];
 
-    // Cargar carrusel
+    // Cargar carrusel (solo las 3 primeras películas)
     const carousel = document.getElementById('carousel');
-    movies.forEach(movie => {
+    movies.slice(0, 3).forEach(movie => {
         const slide = document.createElement('img');
         slide.src = movie.poster;
         slide.alt = movie.title;

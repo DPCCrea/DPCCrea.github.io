@@ -1,0 +1,114 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetroFlix - Buscar Películas</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Pantalla de carga -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">CARGANDO...</p>
+        </div>
+    </div>
+
+    <!-- Barra de navegación superior (PC) -->
+    <nav class="navbar desktop-nav">
+        <div class="logo">RETROFLIX</div>
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> <span>Inicio</span></a></li>
+            <li><a href="busca.html" class="active"><i class="fas fa-search"></i> <span>Buscar</span></a></li>
+            <li><a href="#"><i class="fas fa-film"></i> <span>Películas</span></a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> <span>Ajustes</span></a></li>
+        </ul>
+        <div class="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </div>
+    </nav>
+
+    <!-- Barra de navegación inferior (Móvil) -->
+    <nav class="navbar mobile-nav">
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> <span>Inicio</span></a></li>
+            <li><a href="busca.html" class="active"><i class="fas fa-search"></i> <span>Buscar</span></a></li>
+            <li><a href="#"><i class="fas fa-film"></i> <span>Películas</span></a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> <span>Ajustes</span></a></li>
+        </ul>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main>
+        <!-- Sección de búsqueda -->
+        <section class="movies-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Buscar películas..." class="search-input">
+                <button class="search-button"><i class="fas fa-search"></i></button>
+            </div>
+            <h2 class="section-title">BUSCAR PELÍCULAS</h2>
+            <div class="movies-grid" id="moviesGrid">
+                <!-- Películas se cargarán aquí con JavaScript -->
+            </div>
+        </section>
+
+        <!-- Reproductor de video (oculto inicialmente) -->
+        <div class="video-player-container" id="videoPlayerContainer">
+            <div class="video-header">
+                <h2 id="videoTitle"></h2>
+                <button class="close-video" id="closeVideo"><i class="fas fa-times"></i></button>
+            </div>
+            <video controls id="moviePlayer" class="video-player">
+                Tu navegador no soporta el elemento de video.
+            </video>
+            <div class="video-controls">
+                <button class="add-to-list"><i class="fas fa-plus"></i> Mi lista</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="busca.js"></script>
+</body>
+</html>

@@ -201,12 +201,12 @@ body {
     color: white;
 }
 
-/* Buscador */
+/* Buscador en sección de películas */
 .search-container {
     padding: 20px;
     display: flex;
     justify-content: center;
-    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .search-input {
@@ -500,6 +500,11 @@ body.light-mode {
 
     .carousel-container {
         max-width: 800px;
+    }
+
+    .search-container {
+        padding: 20px;
+        margin-bottom: 30px;
     }
 }
 
