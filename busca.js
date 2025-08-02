@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const movies = [
             {
                 id: 1,
-                title: "CYBER RUNNER 2077",
+                title: "PROXIMAMENTE",
                 year: 2023,
                 genre: "Sci-Fi",
                 poster: "assets/peliculas/1.png",
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             {
                 id: 2,
-                title: "NINJA QUEST",
+                title: "PROXIMAMENTE",
                 year: 2022,
                 genre: "Acción",
                 poster: "assets/peliculas/2.png",
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             {
                 id: 3,
-                title: "RETRO APOCALYPSE",
+                title: "PROXIMAMENTE",
                 year: 2024,
                 genre: "Aventura",
                 poster: "assets/peliculas/3.png",
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             {
                 id: 4,
-                title: "PIXEL WARRIOR",
+                title: "PROXIMAMENTE",
                 year: 2025,
                 genre: "Acción",
                 poster: "assets/peliculas/4.png",
